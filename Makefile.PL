@@ -99,7 +99,7 @@ WriteMakefile(
     },
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Inline/Lua.pm', # retrieve abstract from module
-       AUTHOR         => 'Tassilo von Parseval <tassilo.von.parseval@rwth-aachen.de>') : ()),
+       AUTHOR         => ['Tassilo von Parseval <tassilo.von.parseval@rwth-aachen.de>', 'Rob Hoelz <rob@hoelz.ro>']) : ()),
     LIBS              => [ $LIBS ],
     DEFINE            => '',
     INC               => "-I. " . $INC,

@@ -749,10 +749,12 @@ Lua's home can be found at L<http://www.lua.org/>.
 =head1 AUTHOR
 
 Tassilo von Parseval, E<lt>tassilo.von.parseval@rwth-aachen.deE<gt>
+Rob Hoelz E<lt>rob@hoelz.roE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2004-2007 by Tassilo von Parseval
+Copyright (C) 2012 Rob Hoelz
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,
