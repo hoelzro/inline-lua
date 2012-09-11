@@ -1,4 +1,4 @@
-Inline-Lua version 0.03
+Inline-Lua version 0.05
 =======================
 
 Use inlined Lua code from Perl. See http://www.lua.org/ for details on Lua.

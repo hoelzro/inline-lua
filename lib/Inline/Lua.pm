@@ -74,7 +74,7 @@ use Fcntl qw/:seek/;
 
 our @ISA = qw(Inline);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 $Inline::Lua::_undef = undef;
 

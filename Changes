@@ -1,5 +1,9 @@
 Revision history for Perl extension Inline::Lua.
 
+0.05  Tue Sep 11 2012
+        - Find libs/includes more intelligently
+        - Allow building on Perl 5.12 and later
+
 0.04  Mo Apr 16 06:08:10 EDT 2007
         - patched to work with Lua 5.1 + detection of a memory leak with lua tables
           (provided by William Ahern <wahern AT barracudanetworks DOT com>)
