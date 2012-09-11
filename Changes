@@ -1,0 +1,19 @@
+Revision history for Perl extension Inline::Lua.
+
+0.04  Mo Apr 16 06:08:10 EDT 2007
+        - patched to work with Lua 5.1 + detection of a memory leak with lua tables
+          (provided by William Ahern <wahern AT barracudanetworks DOT com>)
+        - some minor changes to shut up compiler warnings
+
+0.03  Sun Jun 19 17:22:34 CEST 2005
+	- lua is actually called lua50 on Debian: 
+	  Do Makefile.PL deal with it	
+
+0.02  Fri Jun 25 07:00:14 CEST 2004
+	- Inline::Lua generated Perl subs that had a rotten
+	  'use lib' statement which only worked on my machine
+
+0.01  Thu Jun 10 06:56:29 2004
+	- original version; created by h2xs 1.23 with options
+		-b 5.6.0 -n Inline::Lua
+
