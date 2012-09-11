@@ -209,11 +209,12 @@ push_val (lua_State *L, SV *val) {
     }
 
     switch (SvTYPE(val)) {
-	case SVt_RV:
-	    push_ref(L, val);
-	    return;
-	case SVt_IV: 
-	    lua_pushnumber(L, (lua_Number)SvIV(val));
+	case SVt_IV:
+            if(SvROK(val)) {
+                push_ref(L, val);
+            } else {
+                lua_pushnumber(L, (lua_Number)SvIV(val));
+            }
 	    return;
 	case SVt_NV:
 	    lua_pushnumber(L, (lua_Number)SvNV(val));
