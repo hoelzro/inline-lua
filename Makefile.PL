@@ -2,19 +2,69 @@ use 5.006;
 use ExtUtils::MakeMaker;
 use Config;
 
-use constant LUA_LIBS	=> 1;
-use constant LUA_INC	=> 2;
+use constant LUA_LIBS => 1;
+use constant LUA_INC  => 2;
+
+sub which {
+    my ( $program ) = @_;
+
+    my $path = qx(which $program 2>/dev/null);
+    if($?) {
+        return undef;
+    }
+    chomp $path;
+    return $path;
+}
+
+sub has_program {
+    my ( $program ) = @_;
+
+    my $path = which($program);
+
+    return defined($path);
+}
+
+{
+    my $config_program;
+
+    sub get_config_program {
+        unless(defined $config_program) {
+            if(has_program('lua-config')) {
+                $config_program = 'lua-config';
+            } elsif(has_program('pkg-config')) {
+                system 'pkg-config lua >/dev/null 2>/dev/null'; # XXX *nix-specific
+                if($?) {
+                    system 'pkg-config lua5.1 >/dev/null 2>/dev/null'; # XXX *nix-specific
+
+                    if($?) {
+                        # XXX uh-oh
+                    } else {
+                        $config_program = 'pkg-config lua5.1';
+                    }
+                } else {
+                    $config_program = 'pkg-config lua';
+                }
+            } else {
+                # XXX uh-oh...
+            }
+        }
+
+        return $config_program;
+    }
+}
 
 sub lua_conf {
+    my $config_program = get_config_program();
+
     my $meth = shift;
     # lua-config is Debian specific
     if ($meth == LUA_LIBS) {
-	chomp (my $val = `lua-config --libs` || "-llua -llualib");
-	return $val;
+        chomp (my $val = `$config_program --libs` || "-llua -llualib");
+        return $val;
     }
     if ($meth == LUA_INC) {
-	chomp (my $val = `lua-config --include` || "");
-	return $val;
+        chomp (my $val = `$config_program --cflags` || "");
+        return $val;
     }
 }
 
@@ -30,7 +80,7 @@ sub have_lua {
 if (! have_lua()) {
     die <<EOD;
 *******************************************
-Couldn't find a working Lua installation 
+Couldn't find a working Lua installation
 on this matchine. This is required for
 this module.
 
@@ -42,18 +92,18 @@ EOD
 
 WriteMakefile(
     NAME              => 'Inline::Lua',
-    VERSION_FROM      => 'lib/Inline/Lua.pm', 
+    VERSION_FROM      => 'lib/Inline/Lua.pm',
     PREREQ_PM         => {
-	'Test::More' => 0,
-	'Inline'     => 0,
-    }, 
+        'Test::More' => 0,
+        'Inline'     => 0,
+    },
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Inline/Lua.pm', # retrieve abstract from module
        AUTHOR         => 'Tassilo von Parseval <tassilo.von.parseval@rwth-aachen.de>') : ()),
-    LIBS              => [ $LIBS ], 
-    DEFINE            => '', 
-    INC               => "-I. " . $INC, 
-    clean	      => { FILES => "_Inline a.out" },
+    LIBS              => [ $LIBS ],
+    DEFINE            => '',
+    INC               => "-I. " . $INC,
+    clean             => { FILES => "_Inline a.out" },
 );
 if  (eval {require ExtUtils::Constant; 1}) {
   # If you edit these definitions to change the constants used by this module,
