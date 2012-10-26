@@ -18,7 +18,7 @@ This module requires these other modules and libraries:
 
     Inline
     Test::More
-    Lua 5.0	(this module actually tested on 5.0.2)
+    Lua 5.0	library and header files (this module actually tested on 5.0.2)
     C compiler
 
 COPYRIGHT AND LICENCE
