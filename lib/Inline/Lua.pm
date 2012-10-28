@@ -740,6 +740,14 @@ If you encounter any of the above, please report it to me.
 
 =back
 
+=head1 FAQ
+
+=head2 What do I do if I want to sandbox my code?
+
+Many solutions exist for this, and determining which one to use depends on
+your needs.  Please consult http://lua-users.org/wiki/SandBoxes for more
+information.
+
 =head1 SEE ALSO
 
 L<Inline>
