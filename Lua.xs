@@ -86,7 +86,6 @@ trigger_cv (lua_State *L) {
     for (i = 0; i < nresults; i++) {
 	int offset = nresults - i - 1;
 	SV *val = *(sp - offset);
-	SvREFCNT_inc(val);
 	push_val(L, val);
     }
     /* pop all in one go */
