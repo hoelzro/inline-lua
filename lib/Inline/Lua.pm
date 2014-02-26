@@ -75,8 +75,6 @@ use Fcntl qw/:seek/;
 
 our @ISA = qw(Inline);
 
-our $VERSION = '0.05';
-
 $Inline::Lua::_undef = undef;
 
 sub register {
@@ -211,15 +209,13 @@ sub AUTOLOAD {
 }
 
 require XSLoader;
-XSLoader::load('Inline::Lua', $VERSION);
+XSLoader::load('Inline::Lua', $Inline::Lua::VERSION);
 
 
 1;
 __END__
 
-=head1 NAME
-
-Inline::Lua - Perl extension for embedding Lua scripts into Perl code
+# ABSTRACT: Perl extension for embedding Lua scripts into Perl code
 
 =head1 SYNOPSIS
 
@@ -754,21 +750,5 @@ information.
 L<Inline>
 
 Lua's home can be found at L<http://www.lua.org/>.
-
-=head1 AUTHOR
-
-Tassilo von Parseval, E<lt>tassilo.von.parseval@rwth-aachen.deE<gt>
-Rob Hoelz E<lt>rob@hoelz.roE<gt>
-
-=head1 COPYRIGHT AND LICENSE
-
-Copyright (C) 2004-2007 by Tassilo von Parseval
-Copyright (C) 2012-2014 Rob Hoelz
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.4 or,
-at your option, any later version of Perl 5 you may have available.
-
-Lua-5.1.2 Copyright (C) 1994-2007 Lua.org, PUC-Rio.
 
 =cut
