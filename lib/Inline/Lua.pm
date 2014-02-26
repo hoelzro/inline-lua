@@ -1,4 +1,5 @@
-package Inline::Lua::Boolean;
+package # hide from PAUSE
+    Inline::Lua::Boolean;
 
 use warnings;
 use strict;
