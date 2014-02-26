@@ -135,22 +135,23 @@ sub build {
 	$lua->compile($o->{API}{code}, "$obj.bc", 1);
     } 
      
-    open LUA, ">$obj" or croak "Can't open $obj for output: $!";
-    print LUA <<EOCODE;
+    my $lua_fh;
+    open $lua_fh, '>', $obj or croak "Can't open $obj for output: $!";
+    print $lua_fh <<EOCODE;
 package $caller;
 require Inline::Lua;
 EOCODE
     
     for (@funcs) {
 	my ($name, $func) = each %$_;
-	print LUA <<EOCODE;
+	print $lua_fh <<EOCODE;
 sub $name {
     \$lua->call(\"$name\", @{[ scalar grep $_ ne '...', @{ $func->{proto} } ]}, \@_);
 }
 EOCODE
     }
 
-    print LUA <<EOCODE;
+    print $lua_fh <<EOCODE;
 1;
 EOCODE
 }
@@ -160,22 +161,24 @@ sub load {
     my $obj = $o->{API}{location};
     {
 	local $/;
-	open BC, "$o->{API}{location}.bc" 
+        my $bc_fh;
+	open $bc_fh, '<', $obj . '.bc'
 	    or die "Bytecode mysteriously vanished: $!";
-	my $bc = <BC>;
+	my $bc = <$bc_fh>;
 	($o->{ILSM}{lua} = Inline::Lua->interpreter)->compile($bc, "", 0);
     }
-    open LUA, "<$obj" or croak "Can't oben $obj for input: $!";
+    my $lua_fh;
+    open $lua_fh, '<', $obj or croak "Can't oben $obj for input: $!";
     {
 	local $/;
 	my $lua = $o->{ILSM}{lua};
-	my $code = <LUA>;
+	my $code = <$lua_fh>;
 	eval <<EOCODE;
 my \$lua = Inline::Lua->interpreter;
 $code;
 EOCODE
     }
-    close LUA;
+    close $lua_fh;
 }
   
 sub create_func_ref {
