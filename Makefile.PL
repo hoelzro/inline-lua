@@ -77,6 +77,8 @@ sub have_lua {
     return 0;
 }
 
+##{ $share_dir_code{preamble} || '' ##}
+
 if (! have_lua()) {
     die <<EOD;
 *******************************************
@@ -92,14 +94,8 @@ EOD
 
 WriteMakefile(
     NAME              => 'Inline::Lua',
-    VERSION_FROM      => 'lib/Inline/Lua.pm',
-    PREREQ_PM         => {
-        'Test::More' => 0,
-        'Inline'     => 0,
-    },
-    ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
-      (ABSTRACT_FROM  => 'lib/Inline/Lua.pm', # retrieve abstract from module
-       AUTHOR         => ['Tassilo von Parseval <tassilo.von.parseval@rwth-aachen.de>', 'Rob Hoelz <rob@hoelz.ro>']) : ()),
+##{ $plugin->get_default(qw(ABSTRACT AUTHOR LICENSE VERSION)) ##}
+##{ $plugin->get_prereqs(1) ##}
     LIBS              => [ $LIBS ],
     DEFINE            => '',
     INC               => "-I. " . $INC,
@@ -128,3 +124,5 @@ else {
     copy ($fallback, $file) or die "Can't copy $fallback to $file: $!";
   }
 }
+
+##{ $share_dir_code{postamble} || '' ##}
