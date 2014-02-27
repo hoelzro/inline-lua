@@ -168,7 +168,7 @@ sub load {
 	($o->{ILSM}{lua} = Inline::Lua->interpreter)->compile($bc, "", 0);
     }
     my $lua_fh;
-    open $lua_fh, '<', $obj or croak "Can't oben $obj for input: $!";
+    open $lua_fh, '<', $obj or croak "Can't open $obj for input: $!";
     {
 	local $/;
 	my $lua = $o->{ILSM}{lua};
