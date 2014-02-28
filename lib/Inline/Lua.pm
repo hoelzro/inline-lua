@@ -1,65 +1,3 @@
-package # hide from PAUSE
-    Inline::Lua::Boolean;
-
-use warnings;
-use strict;
-
-use overload
-	fallback	=> undef,
-	'0+'		=> \&tonumber,
-	'+'		=> \&add,
-	'-'		=> \&sub,
-	'<=>'		=> \&cmp,
-	'cmp'		=> \&cmp;
-
-
-sub TRUE  { __PACKAGE__->new(1) }
-sub FALSE { __PACKAGE__->new(0) }
-
-
-sub new {
-        my $class       = shift;
-        my $bool        = (shift)? 1 : 0;
-        my $self        = bless \$bool, $class;
-
-        return $self;
-} # new
-
-
-sub add {
-	my $self	= shift;
-	my $rop		= shift;
-
-	return int($self) + $rop;
-} # add
-
-
-sub sub {
-	my $self	= shift;
-	my $rop		= shift;
-	my $swap	= shift;
-
-	return ($swap)? $rop - int($self) : int($self) - $rop;
-} # sub
-
-
-sub cmp {
-	my $self	= shift;
-	my $rop		= shift;
-	my $swap	= shift;
-
-	return ($swap)? ($rop <=> int($self)) : (int($self) <=> $rop);
-} # cmp
-
-
-sub tonumber {
-	my $self	= shift;
-
-	return (${$self})? 1 : 0;
-} # tonumber
-
-
-1;
 package Inline::Lua;
 
 use 5.006;
@@ -213,6 +151,66 @@ sub AUTOLOAD {
 
 require XSLoader;
 XSLoader::load('Inline::Lua', $Inline::Lua::VERSION);
+
+package # hide from PAUSE
+    Inline::Lua::Boolean;
+
+use warnings;
+use strict;
+
+use overload
+	fallback	=> undef,
+	'0+'		=> \&tonumber,
+	'+'		=> \&add,
+	'-'		=> \&sub,
+	'<=>'		=> \&cmp,
+	'cmp'		=> \&cmp;
+
+
+sub TRUE  { __PACKAGE__->new(1) }
+sub FALSE { __PACKAGE__->new(0) }
+
+
+sub new {
+        my $class       = shift;
+        my $bool        = (shift)? 1 : 0;
+        my $self        = bless \$bool, $class;
+
+        return $self;
+} # new
+
+
+sub add {
+	my $self	= shift;
+	my $rop		= shift;
+
+	return int($self) + $rop;
+} # add
+
+
+sub sub {
+	my $self	= shift;
+	my $rop		= shift;
+	my $swap	= shift;
+
+	return ($swap)? $rop - int($self) : int($self) - $rop;
+} # sub
+
+
+sub cmp {
+	my $self	= shift;
+	my $rop		= shift;
+	my $swap	= shift;
+
+	return ($swap)? ($rop <=> int($self)) : (int($self) <=> $rop);
+} # cmp
+
+
+sub tonumber {
+	my $self	= shift;
+
+	return (${$self})? 1 : 0;
+} # tonumber
 
 
 1;
