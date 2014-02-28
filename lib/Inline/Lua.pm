@@ -8,7 +8,6 @@ use Carp;
 require Exporter;
 use AutoLoader;
 require Inline;
-use Data::Dumper;
 use Fcntl qw/:seek/;
 
 our @ISA = qw(Inline);
@@ -40,6 +39,7 @@ sub validate {
 	    Inline::Lua->register_undef($val);
 	}
     }
+    return;
 }
 
 sub build {
@@ -74,7 +74,7 @@ sub build {
     } 
      
     my $lua_fh;
-    open $lua_fh, '>', $obj or croak "Can't open $obj for output: $!";
+    open $lua_fh, '>', $obj or croak "Can't open $obj for output: $!"; ## no critic (InputOutput::RequireBriefOpen)
     print $lua_fh <<EOCODE;
 package $caller;
 require Inline::Lua;
@@ -92,6 +92,8 @@ EOCODE
     print $lua_fh <<EOCODE;
 1;
 EOCODE
+    close $lua_fh;
+    return;
 }
 
 sub load {
@@ -103,20 +105,22 @@ sub load {
 	open $bc_fh, '<', $obj . '.bc'
 	    or die "Bytecode mysteriously vanished: $!";
 	my $bc = <$bc_fh>;
+        close $bc_fh;
 	($o->{ILSM}{lua} = Inline::Lua->interpreter)->compile($bc, "", 0);
     }
     my $lua_fh;
-    open $lua_fh, '<', $obj or croak "Can't open $obj for input: $!";
+    open $lua_fh, '<', $obj or croak "Can't open $obj for input: $!"; ## no critic (InputOutput::RequireBriefOpen)
     {
 	local $/;
 	my $lua = $o->{ILSM}{lua};
 	my $code = <$lua_fh>;
-	eval <<EOCODE;
+	eval <<EOCODE; ## no critic
 my \$lua = Inline::Lua->interpreter;
 $code;
 EOCODE
     }
     close $lua_fh;
+    return;
 }
   
 sub create_func_ref {
@@ -137,7 +141,7 @@ sub AUTOLOAD {
     my ($error, $val) = constant($constname);
     if ($error) { croak $error; }
     {
-	no strict 'refs';
+	no strict 'refs'; ## no critic (TestingAndDebugging::ProhibitNoStrict)
         *$AUTOLOAD = sub { $val };
     }
     goto &$AUTOLOAD;
@@ -156,13 +160,13 @@ use overload
 	fallback	=> undef,
 	'0+'		=> \&tonumber,
 	'+'		=> \&add,
-	'-'		=> \&sub,
-	'<=>'		=> \&cmp,
-	'cmp'		=> \&cmp;
+	'-'		=> \&subtract,
+	'<=>'		=> \&compare,
+	'cmp'		=> \&compare;
 
 
-sub TRUE  { __PACKAGE__->new(1) }
-sub FALSE { __PACKAGE__->new(0) }
+sub TRUE  { return __PACKAGE__->new(1) }
+sub FALSE { return __PACKAGE__->new(0) }
 
 
 sub new {
@@ -182,22 +186,22 @@ sub add {
 } # add
 
 
-sub sub {
+sub subtract {
 	my $self	= shift;
 	my $rop		= shift;
 	my $swap	= shift;
 
 	return ($swap)? $rop - int($self) : int($self) - $rop;
-} # sub
+} # subtract
 
 
-sub cmp {
+sub compare {
 	my $self	= shift;
 	my $rop		= shift;
 	my $swap	= shift;
 
 	return ($swap)? ($rop <=> int($self)) : (int($self) <=> $rop);
-} # cmp
+} # compare
 
 
 sub tonumber {
