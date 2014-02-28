@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-Inline::Lua::Boolean - Perl extension for embedding Lua scripts into Perl code
+Inline::Lua - Perl extension for embedding Lua scripts into Perl code
 
 =head1 VERSION
 
