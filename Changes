@@ -1,6 +1,8 @@
 Revision history for Perl extension Inline::Lua.
 
 {{$NEXT}}
+
+0.06 March 09 2014
         - Fix a memory leak (Thanks damiens-robert!)
 
 0.05  Tue Sep 11 2012
