@@ -1,5 +1,7 @@
+## no critic (RequireUseStrict)
 package Inline::Lua;
 
+## use critic (RequireUseStrict)
 use 5.006;
 use strict;
 use warnings;
