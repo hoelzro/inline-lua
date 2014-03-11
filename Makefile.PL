@@ -1,94 +1,75 @@
 use 5.006;
+use strict;
+use warnings;
 use ExtUtils::MakeMaker;
 use Config;
 
-use constant LUA_LIBS => 1;
-use constant LUA_INC  => 2;
-
-sub which {
-    my ( $program ) = @_;
-
-    my $path = qx(which $program 2>/dev/null);
-    if($?) {
-        return undef;
-    }
-    chomp $path;
-    return $path;
-}
-
-sub has_program {
-    my ( $program ) = @_;
-
-    my $path = which($program);
-
-    return defined($path);
-}
-
 {
-    my $config_program;
+    my $CC = $Config{cc};
+    my @config;
 
-    sub get_config_program {
-        unless(defined $config_program) {
-            if(has_program('lua-config')) {
-                $config_program = 'lua-config';
-            } elsif(has_program('pkg-config')) {
-                system 'pkg-config lua >/dev/null 2>/dev/null'; # XXX *nix-specific
-                if($?) {
-                    system 'pkg-config lua5.1 >/dev/null 2>/dev/null'; # XXX *nix-specific
+    sub get_lua_config {
+        my %args = map { split /\s*=\s*/ } @ARGV;
 
-                    if($?) {
-                        # XXX uh-oh
-                    } else {
-                        $config_program = 'pkg-config lua5.1';
-                    }
-                } else {
-                    $config_program = 'pkg-config lua';
+        my $libs = $args{'LIBS'};
+        my $inc  = $args{'INC'};
+
+        return ( $inc, $libs ) if defined($inc) && defined($libs);
+
+        my @candidates = (
+            'lua-config',
+            'pkg-config lua',
+            'pkg-config lua5.1',
+            'pkg-config lua-5.1',
+        );
+
+        foreach my $command (@candidates) {
+            my $status = system "$command >/dev/null 2>/dev/null"; # XXX *nix-specific
+
+            if($status == 0) {
+                my $extra_args = `$command --libs --cflags`;
+                chomp $extra_args;
+                $status = system("$CC check.c $extra_args 2>/dev/null");
+
+                if($status == 0) {
+                    $libs ||= `$command --libs`;
+                    $inc  ||= `$command --cflags`;
+
+                    chomp for $libs, $inc;
+
+                    use feature qw(say);
+                    say "inc = $inc, libs = $libs";
+
+                    return ( $inc, $libs );
                 }
-            } else {
-                # XXX uh-oh...
             }
         }
 
-        return $config_program;
+        return;
     }
-}
-
-sub lua_conf {
-    my $config_program = get_config_program();
-
-    my $meth = shift;
-    # lua-config is Debian specific
-    if ($meth == LUA_LIBS) {
-        chomp (my $val = `$config_program --libs` || "-llua -llualib");
-        return $val;
-    }
-    if ($meth == LUA_INC) {
-        chomp (my $val = `$config_program --cflags` || "");
-        return $val;
-    }
-}
-
-sub have_lua {
-    my $CC = $Config{cc};
-    my %args = map { split /\s*=\s*/ } @ARGV;
-    $LIBS = $args{ LIBS } || lua_conf(LUA_LIBS);
-    $INC = $args{ INC } || lua_conf(LUA_INC);
-    return 1 if system("$CC check.c $INC $LIBS 2>/dev/null") == 0;
-    return 0;
 }
 
 ##{ $share_dir_code{preamble} || '' ##}
 
-if (! have_lua()) {
+my ( $inc, $libs ) = get_lua_config();
+
+if (!$inc && !$libs ) {
     die <<EOD;
 *******************************************
 Couldn't find a working Lua installation
-on this matchine. This is required for
+on this machine. This is required for
 this module.
 
 To obtain it, go to
     http://www.lua.org/download.html
 *******************************************
+
+If Makefile.PL failed to find your Lua installation,
+you can specify INC and LIBS flags directly:
+
+  perl Makefile.PL INC=-I/usr/include/lua5.1 LIBS=-llua5.1
+
+(You can also specify INC/LIBS using PERL_MM_OPT)
 EOD
 }
 
@@ -96,9 +77,9 @@ WriteMakefile(
     NAME              => 'Inline::Lua',
 ##{ $plugin->get_default(qw(ABSTRACT AUTHOR LICENSE VERSION)) ##}
 ##{ $plugin->get_prereqs(1) ##}
-    LIBS              => [ $LIBS ],
+    LIBS              => [ $libs ],
     DEFINE            => '',
-    INC               => "-I. " . $INC,
+    INC               => "-I. " . $inc,
     clean             => { FILES => "_Inline a.out" },
 );
 if  (eval {require ExtUtils::Constant; 1}) {
