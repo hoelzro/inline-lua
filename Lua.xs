@@ -389,7 +389,9 @@ SV*
 table_ref (lua_State *L, int idx) {
     int isary = 1;	/* initially we always assume it's an array */
     AV *tbl = newAV();	
-  
+
+    assert(idx >= 1);
+
     lua_pushnil(L);
     while (lua_next(L, idx) != 0) {
 	if (add_pair(L, (SV**)&tbl,  &isary))
