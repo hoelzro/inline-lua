@@ -11,3 +11,5 @@ Makefile
 Makefile.old
 MYMETA.*
 _Inline/
+.build
+/Inline-Lua-*
