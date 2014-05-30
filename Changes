@@ -1,6 +1,7 @@
 Revision history for Perl extension Inline::Lua.
 
 {{$NEXT}}
+        - Fix a segfault (GH #5)
 
 0.07 March 10 2014
         - Improve Lua detection
