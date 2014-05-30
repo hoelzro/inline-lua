@@ -246,7 +246,7 @@ luaval_to_perl (lua_State *L, int idx, int *dopop) {
 	case LUA_TSTRING:
 	    return newSVpvn(lua_tostring(L, idx), lua_strlen(L, idx));
 	case LUA_TTABLE:
-	    return table_ref(L, lua_gettop(L));
+	    return table_ref(L, idx);
 	case LUA_TFUNCTION:
 	    *dopop = 0;
 	    return func_ref(L);
@@ -333,7 +333,7 @@ add_pair (lua_State *L, SV **any, int *isary) {
 
     if (*isary) {
 	int idx = lua_tonumber(L, KEY);
-	SV *val = luaval_to_perl(L, VAL, &dopop);
+	SV *val = luaval_to_perl(L, lua_gettop(L), &dopop);
 	SvREFCNT_inc(val);
 	if (!av_store((AV*)*any, idx-1, val))
 	    SvREFCNT_dec(val);
@@ -358,7 +358,7 @@ add_pair (lua_State *L, SV **any, int *isary) {
 	    default:
 		croak("Illegal type (%s) in table subscript", lua_typename(L, lua_type(L, KEY)));
 	}
-	val = luaval_to_perl(L, VAL, &dopop);
+	val = luaval_to_perl(L, lua_gettop(L), &dopop);
 	SvREFCNT_inc(val);
 	if (!hv_store((HV*)*any, key, klen, val, 0))
 	    SvREFCNT_dec(val);
