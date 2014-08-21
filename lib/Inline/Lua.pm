@@ -30,7 +30,7 @@ sub validate {
     
     while (@_) {
 	my ($key, $val) = splice @_, 0, 2;
-	if ($key eq 'Undef') {
+	if (uc $key eq 'UNDEF') {
 	    # Don't think I am stupid because I am going through those hoops to
 	    # pass a reference correctly.  If I don't do it that way, an SvPVIV
 	    # (with the ROK flag set!) is passed for some reason.
