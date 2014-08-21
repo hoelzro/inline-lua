@@ -1,6 +1,8 @@
 Revision history for Perl extension Inline::Lua.
 
 {{$NEXT}}
+
+0.09 August 20 2014
         - Fix a bug with the Undef option when using Inline 0.67 and newer (Thanks to Klaus Ethgen for the report!)
 
 0.08 May 29 2014
