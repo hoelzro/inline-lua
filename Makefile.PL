@@ -16,6 +16,13 @@ use Config;
 
         return ( $inc, $libs ) if defined($inc) && defined($libs);
 
+        if ($^O eq 'MSWin32' && exists $ENV{'LUA_DEV'}) {
+            $inc  = '"' . '-I' . $ENV{LUA_DEV} . '\\include'         . '"';
+            $libs = '"' . '-l' . $ENV{LUA_DEV} . '\\lib\\lua5.1.lib' . '"';
+
+            return ( $inc, $libs );
+        }
+
         my @candidates = (
             'lua-config',
             'pkg-config lua',
