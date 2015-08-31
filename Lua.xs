@@ -596,8 +596,11 @@ call (lua, func, nargs, ...)
 		push_val(lua, NULL);
 	status = lua_pcall(lua, actual_args, LUA_MULTRET, 0);
 	
-	if (status != 0) 
-	    croak("error: %s\n", lua_tostring(lua, -1));
+	if (status != 0) {
+            SV *error_msg = mess("error: %s\n", lua_tostring(lua, -1));
+            lua_pop(lua, 1);
+	    croak_sv(error_msg);
+        }
 	
 	/* return args to caller:
 	 * lua functions appear to push their return values in reverse order */
