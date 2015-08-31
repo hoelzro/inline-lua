@@ -14,7 +14,7 @@
 #include <lualib.h>
 #include <lauxlib.h>
 
-SV *UNDEF, *LuaNil, NIL; 
+SV *UNDEF, *LuaNil, NIL;
 AV *INLINE_RETURN;
 
 void push_ary	    (lua_State *, AV*);
@@ -64,23 +64,23 @@ trigger_cv (lua_State *L) {
     int dopop;
     int nargs = lua_gettop(L);
     int nresults;
-    
+
     CV *cv = (CV*)lua_touserdata(L, lua_upvalueindex(1));
     ENTER;
     SAVETMPS;
     PUSHMARK(SP);
-    
+
     for (i = 1; i <= nargs; i++) {
 	SV *sv = luaval_to_perl(L, i, &dopop);
 	XPUSHs(sv_2mortal(sv));
     }
     lua_settop(L, 0);
     PUTBACK;
-    
+
     nresults = call_sv((SV*)cv, G_ARRAY);
 
     SPAGAIN;
-   
+
     /* again the reversed order of values
      * in the Lua stack bites, so we
      * cannot use POPs here */
@@ -91,7 +91,7 @@ trigger_cv (lua_State *L) {
     }
     /* pop all in one go */
     sp -= nresults;
-    
+
     PUTBACK;
     FREETMPS;
     LEAVE;
@@ -116,7 +116,7 @@ push_ary (lua_State *L, AV *av) {
     for (i = 0; i <= av_len(av); i++) {
 	SV **ptr = av_fetch(av, i, FALSE);
 	lua_pushnumber(L, (lua_Number)i+1);
-	if (ptr) 
+	if (ptr)
 	    push_val(L, *ptr);
 	else
 	    lua_pushnil(L);
@@ -128,7 +128,7 @@ push_ary (lua_State *L, AV *av) {
 void
 push_hash (lua_State *L, HV *hv) {
     register HE* he;
-    
+
     lua_newtable(L);
     hv_iterinit(hv);
 
@@ -141,7 +141,7 @@ push_hash (lua_State *L, HV *hv) {
 	lua_settable(L, -3);
     }
 }
-   
+
 /* push a Perl function reference onto the Lua stack */
 void
 push_func (lua_State *L, CV *cv) {
@@ -192,8 +192,8 @@ push_ref (lua_State *L, SV *val) {
  * handled by Inline::Lua */
 void
 push_val (lua_State *L, SV *val) {
-    
-    if (is_lua_nil(val)) { 
+
+    if (is_lua_nil(val)) {
 	lua_pushnil(L);
 	return;
     }
@@ -201,7 +201,7 @@ push_val (lua_State *L, SV *val) {
     if (!val || val == &PL_sv_undef || !SvOK(val)) {
 	if (!UNDEF || UNDEF == &PL_sv_undef || !SvOK(UNDEF))
 	    lua_pushnil(L);
-	else 
+	else
 	    /* otherwise we can safely call push_val again
 	     * because Inline::Lua::_undef is defined */
 	    push_val(L, UNDEF);
@@ -219,7 +219,7 @@ push_val (lua_State *L, SV *val) {
 	case SVt_NV:
 	    lua_pushnumber(L, (lua_Number)SvNV(val));
 	    return;
-	case SVt_PV: case SVt_PVIV: 
+	case SVt_PV: case SVt_PVIV:
 	case SVt_PVNV: case SVt_PVMG:
 	    {
 		STRLEN n_a;
@@ -228,10 +228,10 @@ push_val (lua_State *L, SV *val) {
 		return;
 	    }
     }
-} 
+}
 
-/* Turns a Lua type into a Perl type and returns it.  
- * 'dopop' is set to 1 if the caller has to do a lua_pop. 
+/* Turns a Lua type into a Perl type and returns it.
+ * 'dopop' is set to 1 if the caller has to do a lua_pop.
  * The only case where this does not happen is if the value
  * is a LUA_TFUNCTION (luaL_ref() already pops it off). */
 SV*
@@ -264,7 +264,7 @@ AV*
 lua_main_return (lua_State *L, int idx, int num) {
     register int i;
     int nargs = idx - num + 1;
-   
+
     for (i = 0; i < nargs; i++) {
 	int top = idx-i;
 	av_unshift(INLINE_RETURN, 1);
@@ -284,7 +284,7 @@ lua_main_return (lua_State *L, int idx, int num) {
 		    av_store(INLINE_RETURN, 0, table_ref(L, top));
 		    break;
 	    case LUA_TFUNCTION:
-		    av_store(INLINE_RETURN, 0, func_ref(L)); 
+		    av_store(INLINE_RETURN, 0, func_ref(L));
 		    break;
 	    case LUA_TUSERDATA:
 		    av_store(INLINE_RETURN, 0, user_data(L));
@@ -307,7 +307,7 @@ ary_to_hash (AV *ary) {
     HV *hv = newHV();
     SV *key = newSViv(0);
     for (i = 0; i <= len; i++) {
-	if (!av_exists(ary, i)) 
+	if (!av_exists(ary, i))
 	    continue;
 	sv_setiv(key, i+1);	/* +1 because Lua tables start at 1 */
 	hv_store_ent(hv, key, *av_fetch(ary, i, FALSE), 0);
@@ -321,11 +321,11 @@ ary_to_hash (AV *ary) {
  * an array and the current key is a string, 'isary' is set
  * to false and the array transformed into a hash */
 int
-add_pair (lua_State *L, SV **any, int *isary) { 
+add_pair (lua_State *L, SV **any, int *isary) {
 #define KEY -2
 #define VAL -1
     int dopop;
-    
+
     if (*isary && lua_type(L, KEY) != LUA_TNUMBER) {
 	HV *tbl = ary_to_hash((AV*)*any);
 	*isary = 0;
@@ -389,7 +389,7 @@ bool_ref (lua_State *L, int b) {
 SV*
 table_ref (lua_State *L, int idx) {
     int isary = 1;	/* initially we always assume it's an array */
-    AV *tbl = newAV();	
+    AV *tbl = newAV();
 
     assert(idx >= 1);
 
@@ -409,19 +409,19 @@ table_ref (lua_State *L, int idx) {
 SV*
 func_ref (lua_State *L) {
     dSP;
-    
+
     SV *lua = sv_newmortal();
     SV *func = newSViv(luaL_ref(L, LUA_REGISTRYINDEX));
     SV *funcref;
-    
+
     sv_setref_pv(lua, "Inline::Lua", (void*)L);
-    
+
     ENTER;
     PUSHMARK(SP);
     XPUSHs(lua);		/* $lua */
     XPUSHs(sv_2mortal(func));	/* $func */
     PUTBACK;
-    
+
     call_pv("Inline::Lua::create_func_ref", G_SCALAR);
 
     SPAGAIN;
@@ -432,7 +432,7 @@ func_ref (lua_State *L) {
     return funcref;
 }
 
-/* Handles userdata variables. 
+/* Handles userdata variables.
  * Those could be filehandles, for instance */
 
 SV*
@@ -454,9 +454,9 @@ user_data (lua_State *L) {
     } else
 	croak("Attempt to return closed filehandle");
 }
-   
 
-MODULE = Inline::Lua		PACKAGE = Inline::Lua		
+
+MODULE = Inline::Lua		PACKAGE = Inline::Lua
 
 BOOT:
 {
@@ -477,15 +477,15 @@ register_undef (CLASS, undef)
 	UNDEF = undef;
 	SvREFCNT_inc(undef);
     }
-	
+
 lua_State *
-interpreter (CLASS, ...) 
+interpreter (CLASS, ...)
 	char *CLASS;
     CODE:
 	{
 	    char *from_file = NULL;
 	    STRLEN n_a;
-	    
+
 	    if (items > 1)
 		from_file = SvPV(ST(1), n_a);
 
@@ -538,11 +538,11 @@ compile (lua, code, file, dump)
 	    if (f) {
 		lua_dump(lua, dumper, (void*)f);
 		fclose(f);
-	    } else 
+	    } else
 		croak("Error outputting bytecode to %s: %s\n", file, strerror(errno));
 	    XSRETURN_YES;
 	}
-	
+
 	switch (status) {
 	    case 0:
 		{
@@ -563,7 +563,7 @@ compile (lua, code, file, dump)
     }
 
 void
-call (lua, func, nargs, ...) 
+call (lua, func, nargs, ...)
 	lua_State *lua;
 	SV *func;
 	int nargs;
@@ -571,7 +571,7 @@ call (lua, func, nargs, ...)
     {
 	char *name;
 	int ref;
-	int i = 0, j, status; 
+	int i = 0, j, status;
 	int actual_args = 0;
 
 	if (SvPOK(func)) {
@@ -582,7 +582,7 @@ call (lua, func, nargs, ...)
 	    /* function reference */
 	    lua_rawgeti(lua, LUA_REGISTRYINDEX, SvIV(func));
 	}
-	
+
 
 	/* push arguments */
 	for (i = 0; i < items-3; i++, nargs--, actual_args++) {
@@ -595,20 +595,20 @@ call (lua, func, nargs, ...)
 	    for (i = nargs; i > 0; nargs--, actual_args++, i--)
 		push_val(lua, NULL);
 	status = lua_pcall(lua, actual_args, LUA_MULTRET, 0);
-	
+
 	if (status != 0) {
             SV *error_msg = mess("error: %s\n", lua_tostring(lua, -1));
             lua_pop(lua, 1);
 	    croak_sv(error_msg);
         }
-	
+
 	/* return args to caller:
 	 * lua functions appear to push their return values in reverse order */
 	nargs = lua_gettop(lua);
 	EXTEND(SP, nargs);
 	j = 1;
 	while (i = lua_gettop(lua)) {
-	    switch(lua_type(lua, i)) { 
+	    switch(lua_type(lua, i)) {
 		case LUA_TNIL:
 		    ST(nargs - j++) = &PL_sv_undef;
 		    break;
