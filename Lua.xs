@@ -74,6 +74,7 @@ trigger_cv (lua_State *L) {
 	SV *sv = luaval_to_perl(L, i, &dopop);
 	XPUSHs(sv_2mortal(sv));
     }
+    lua_settop(L, 0);
     PUTBACK;
     
     nresults = call_sv((SV*)cv, G_ARRAY);
