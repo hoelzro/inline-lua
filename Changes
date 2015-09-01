@@ -1,6 +1,8 @@
 Revision history for Perl extension Inline::Lua.
 
 {{$NEXT}}
+        - Fix a bug where extra values remain on the Lua stack when Lua calls Perl calls Lua. (Thanks to @unhandyandy for the report!)
+        - Clean up values on the Lua stack when Lua's error() function is called
 
 0.09 August 20 2014
         - Fix a bug with the Undef option when using Inline 0.67 and newer (Thanks to Klaus Ethgen for the report!)
