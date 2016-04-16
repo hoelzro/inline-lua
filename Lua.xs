@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -14,8 +15,16 @@
 #include <lualib.h>
 #include <lauxlib.h>
 
+/* Support Lua 5.2 */
+#if LUA_VERSION_NUM >= 502
+#define lua_open() luaL_newstate()
+#define lua_strlen(L,i) lua_rawlen(L, (i))
+#endif
+
 SV *UNDEF, *LuaNil, NIL;
 AV *INLINE_RETURN;
+
+int close_attempt  (lua_State *);
 
 void push_ary	    (lua_State *, AV*);
 void push_hash	    (lua_State *, HV*);
@@ -153,11 +162,28 @@ push_func (lua_State *L, CV *cv) {
  * along with the appropriate metatable onto the Lua stack */
 void
 push_io (lua_State *L, PerlIO *pio) {
+#if LUA_VERSION_NUM < 502
     FILE **fp = (FILE**)lua_newuserdata(L, sizeof(FILE*));
     *fp = PerlIO_exportFILE(pio, NULL);
     luaL_getmetatable(L, "FILE*");
     lua_setmetatable(L, -2);
+#else
+    // Lua 5.2+
+    // We need a close function or Lua thinks the file handle is closed
+    luaL_Stream *p = (luaL_Stream *)lua_newuserdata(L, sizeof(luaL_Stream));
+    p->f = PerlIO_exportFILE(pio, NULL);
+    p->closef = &close_attempt;
+    luaL_setmetatable(L, LUA_FILEHANDLE);
+#endif
 }
+
+/* Called when Lua >= 5.2 closes a Perl filehandle - We don't currently
+ * do anything with this.  So we end up leaking :stdio layers.
+ */
+int close_attempt(lua_State *L) {
+    return 0;
+}
+
 
 /* push a generic reference into the Lua stack:
  * calls one of push_(ary|hash|func|io) */
