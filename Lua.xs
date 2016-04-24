@@ -16,7 +16,6 @@
 
 /* Support Lua 5.2 */
 #if LUA_VERSION_NUM >= 502
-#define lua_open() luaL_newstate()
 #define lua_strlen(L,i) lua_rawlen(L, (i))
 #endif
 
@@ -515,7 +514,7 @@ interpreter (CLASS, ...)
 		from_file = SvPV(ST(1), n_a);
 
 	    if (!INTERPRETER) {
-		RETVAL = INTERPRETER = lua_open();
+		RETVAL = INTERPRETER = luaL_newstate();
 		if (INTERPRETER) {
 #if LUA_VERSION_NUM >= 501
 		    luaL_openlibs(INTERPRETER);
