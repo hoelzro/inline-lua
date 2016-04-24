@@ -22,7 +22,12 @@
 SV *UNDEF, *LuaNil, NIL;
 AV *INLINE_RETURN;
 
-int close_attempt  (lua_State *);
+/* Called when Lua >= 5.2 closes a Perl filehandle - We don't currently
+ * do anything with this.  So we end up leaking :stdio layers (as we
+ * also do with 5.1).
+ */
+static int close_attempt(lua_State *L) { return 0; }
+
 
 void push_ary	    (lua_State *, AV*);
 void push_hash	    (lua_State *, HV*);
@@ -173,13 +178,6 @@ push_io (lua_State *L, PerlIO *pio) {
     p->closef = &close_attempt;
     luaL_setmetatable(L, LUA_FILEHANDLE);
 #endif
-}
-
-/* Called when Lua >= 5.2 closes a Perl filehandle - We don't currently
- * do anything with this.  So we end up leaking :stdio layers.
- */
-int close_attempt(lua_State *L) {
-    return 0;
 }
 
 
