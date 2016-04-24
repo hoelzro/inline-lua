@@ -516,16 +516,7 @@ interpreter (CLASS, ...)
 	    if (!INTERPRETER) {
 		RETVAL = INTERPRETER = luaL_newstate();
 		if (INTERPRETER) {
-#if LUA_VERSION_NUM >= 501
 		    luaL_openlibs(INTERPRETER);
-#else
-		    luaopen_base(INTERPRETER);
-		    luaopen_table(INTERPRETER);
-		    luaopen_io(INTERPRETER);
-		    luaopen_string(INTERPRETER);
-		    luaopen_debug(INTERPRETER);
-		    luaopen_loadlib(INTERPRETER);
-#endif
 		}
 	    }
 	    else
