@@ -18,8 +18,9 @@ is_deeply([<$fh>], ["foo\n", "bar\n", "baz\n"]);
 __END__
 __Lua__
 function write_file (fh, ...)
-    for i = 1, table.getn(arg), 1 do
-	fh:write(arg[i], "\n")
+    local arg={...}
+    for i,v in ipairs(arg) do
+	fh:write(v, "\n")
     end
 end
 

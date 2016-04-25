@@ -32,7 +32,8 @@ end
 
 function take_any (...)
     local a = ''
-    for i = 1, table.getn(arg), 1 do
+    local arg={...}
+    for i = 1, #arg, 1 do
 	a = a..arg[i]
     end
     return a
