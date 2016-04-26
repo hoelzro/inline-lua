@@ -1,6 +1,7 @@
 Revision history for Perl extension Inline::Lua.
 
 {{$NEXT}}
+        - Add support for Lua 5.2 (thanks to Joel Maslak!)
 
 0.10 August 31 2015
         - Fix a bug where extra values remain on the Lua stack when Lua calls Perl calls Lua. (Thanks to @unhandyandy for the report!)
