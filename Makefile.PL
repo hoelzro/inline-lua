@@ -60,9 +60,12 @@ use Config;
 
 ##{ $share_dir_code{preamble} || '' ##}
 
-my ( $inc, $libs ) = get_lua_config();
+my %makefile_params;
 
-if (!$inc && !$libs ) {
+unless($ENV{'PERL_MM_OPT'}) {
+    my ( $inc, $libs ) = get_lua_config();
+
+    if (!$inc && !$libs ) {
     die <<EOD;
 *******************************************
 Couldn't find a working Lua installation
@@ -80,16 +83,22 @@ you can specify INC and LIBS flags directly:
 
 (You can also specify INC/LIBS using PERL_MM_OPT)
 EOD
+    }
+
+    %makefile_params = (
+        LIBS => [ $libs ],
+        INC  => "-I. $inc",
+    );
 }
 
 WriteMakefile(
     NAME              => 'Inline::Lua',
 ##{ $plugin->get_default(qw(ABSTRACT AUTHOR LICENSE VERSION)) ##}
 ##{ $plugin->get_prereqs(1) ##}
-    LIBS              => [ $libs ],
     DEFINE            => '',
-    INC               => "-I. " . $inc,
     clean             => { FILES => "_Inline a.out" },
+
+    %makefile_params
 );
 if  (eval {require ExtUtils::Constant; 1}) {
   # If you edit these definitions to change the constants used by this module,
