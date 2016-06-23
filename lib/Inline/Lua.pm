@@ -348,7 +348,9 @@ Those are turned into Lua tables:
 
     use Inline Lua => <<EOLUA;
     function print_table (t)
-	table.foreach(t, print)
+      for k, v in pairs(t) do
+        print(k, v)
+      end
     end
     EOLUA
     
@@ -383,21 +385,19 @@ That's the real interesting stuff. You are allowed to call Lua functions with
 function references as arguments and the Lua code will do the right thing:
 
     use Inline Lua => EOLUA
-    function map_print (func, tab)
-	table.foreach(tab, func)
+    function table_foreach (func, tab)
+        for k, v in pairs(tab) do
+          func(k, v)
+        end
     end
     EOLUA
 
     sub dump {
         my ($key, $val) = @_;
 	print "$key => $val\n";
-
-	# table.foreach() breaks out when the return value
-	# is non-nill. Hence undef must be returned.
-     	return undef;
     }
     
-    map_print( \&dump, { key1 => 1, key2 => 2 } );
+    table_foreach( \&dump, { key1 => 1, key2 => 2 } );
    
 Here's a bit of currying. The Lua code calls the code-reference passed to it.
 This code-reference itself returns a reference to a Perl functions which eventually
@@ -597,8 +597,10 @@ etc. A basic example:
 
     __END__
     __Lua__
-    function print_values (...) 
-	table.foreachi(arg, print)
+    function print_values (...)
+        for k, v in pairs {...} do
+            print(k, v)
+        end
     end
 
 This would come out as
@@ -610,28 +612,9 @@ This would come out as
     5       5
     6       6
 
-Sometimes however it is important to return a real C<nil> to Lua. The C<foreach> iterator
-for example breaks out of the iteration when non-nill has been returned. If you want to
-use a Perl function as C<foreach> callback, simply having it return C<undef> will therefore
-not work when I<Undef> was set to some value. Inline::Lua provides a Perl value which is
-always converted to C<nil>: C<$Inline::Lua::Nil>. Here's an example:
-
-    use Inline Lua   => 'DATA',
-               Undef => 'Undefined value';
-	       
-    map_print( [1, 2, 3], sub { print "@_\n"; return $Inline::Lua::Nil } );
-
-    __END__
-    __Lua__
-    function map_print (tab, func)
-	table.foreach(tab, func)
-    end
-
-Results in
-
-    1 1
-    2 2
-    3 3
+Sometimes however it is important to return a real C<nil> to Lua.  Inline::Lua
+provides a Perl value which is always converted to C<nil>:
+C<$Inline::Lua::Nil>.
 
 =head1 LUA FUNCTION PROTOTYPES
 
