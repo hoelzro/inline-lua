@@ -62,7 +62,7 @@ use Config;
 
 my %makefile_params;
 
-unless($ENV{'PERL_MM_OPT'}) {
+unless($ENV{'PERL_MM_OPT'} && $ENV{'PERL_MM_OPT'} =~ /(INC|LIBS)(?![a-z])/i) {
     my ( $inc, $libs ) = get_lua_config();
 
     if (!$inc && !$libs ) {
