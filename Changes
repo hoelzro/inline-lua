@@ -1,6 +1,7 @@
 Revision history for Perl extension Inline::Lua.
 
 {{$NEXT}}
+        - Allow additional PERL_MM_OPT customizations (thanks, Andy Beverley!)
 
 0.12 June 23 2016
         - Remove references to table.foreach from documentation
