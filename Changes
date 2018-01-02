@@ -1,6 +1,7 @@
 Revision history for Perl extension Inline::Lua.
 
 {{$NEXT}}
+        - Add missing dependencies
 
 0.13 December 28 2017
         - Allow additional PERL_MM_OPT customizations (thanks, Andy Beverley!)
