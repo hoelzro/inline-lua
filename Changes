@@ -1,6 +1,8 @@
 Revision history for Perl extension Inline::Lua.
 
 {{$NEXT}}
+
+0.14 January 01 2018
         - Add missing dependencies
 
 0.13 December 28 2017
