@@ -1,6 +1,6 @@
 use Test::More;
 
-BEGIN { plan tests => 9 };
+BEGIN { plan tests => 10 };
 
 use Inline Lua	    => 'DATA',
 	   Undef    => 'undefined value';
@@ -21,11 +21,12 @@ is_deeply(take_table(\@mix),  \@mix,				"mixed");
 
 ok(eq_hash(return_hash(), { key1 => 'val1', key2 => 'val2' }),  "return hash");
 ok(eq_array(return_array(), [1, 2, 3, qw/a b c/]),		"return array");
-eq_hash(return_mixed(), { 1   => 1,
-			     2   => 2, 
-			     3   => 3, 
-			     5   => 5, 
-			     key => 'val' },			"return mixed");
+
+ok(eq_hash(return_mixed(), { 1   => 1,
+			     2   => 2,
+			     3   => 3,
+			     5   => 5,
+			     key => 'val' }),			"return mixed");
 is_deeply(return_nested(), [1, 2, 3, [qw/a b c/]],		"return nested");
 
 __END__
