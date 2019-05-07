@@ -1,8 +1,6 @@
 Revision history for Perl extension Inline::Lua.
 
 {{$NEXT}}
-
-0.15 May 06 2019
         - Add Lua 5.3 support - thanks Andy Beverley!
 
 0.14 January 01 2018
