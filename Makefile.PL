@@ -46,9 +46,6 @@ use Config;
 
                     chomp for $libs, $inc;
 
-                    use feature qw(say);
-                    say "inc = $inc, libs = $libs";
-
                     return ( $inc, $libs );
                 }
             }
