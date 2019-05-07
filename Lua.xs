@@ -59,7 +59,8 @@ num2string (lua_Number n, I32 *klen) {
     char *str;
     STRLEN len;
     sprintf(s, LUA_NUMBER_FMT, n);
-    len = *klen = strlen(s)+1;
+    *klen = strlen(s);
+    len = *klen + 1;
     New(0, str, len, char);
     Copy(s, str, len, char);
     return str;
