@@ -1,6 +1,8 @@
 Revision history for Perl extension Inline::Lua.
 
 {{$NEXT}}
+
+0.16 February 16 2020
         - Fix passing integers into Lua functions - thanks Andy Beverley!
 
 0.15 May 06 2019
