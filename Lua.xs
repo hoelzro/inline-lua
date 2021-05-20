@@ -214,6 +214,46 @@ push_ref (lua_State *L, SV *val) {
     }
 }
 
+static const char *
+svtype_name(svtype type) {
+	switch(type) {
+		case SVt_NULL:
+			return "NULL";
+		case SVt_IV:
+			return "IV";
+		case SVt_NV:
+			return "NV";
+		case SVt_PV:
+			return "PV";
+		case SVt_PVIV:
+			return "PVIV";
+		case SVt_PVNV:
+			return "PVNV";
+		case SVt_PVMG:
+			return "PVMG";
+		case SVt_INVLIST:
+			return "INVLIST";
+		case SVt_REGEXP:
+			return "REGEXP";
+		case SVt_PVGV:
+			return "PVGV";
+		case SVt_PVLV:
+			return "PVLV";
+		case SVt_PVAV:
+			return "PVAV";
+		case SVt_PVHV:
+			return "PVHV";
+		case SVt_PVCV:
+			return "PVCV";
+		case SVt_PVFM:
+			return "PVFM";
+		case SVt_PVIO:
+			return "PVIO";
+		default:
+			return "UNKNOWN";
+	}
+}
+
 /* push a Perl value onto the Lua stack:
  * does the right thing for any Perl type
  * handled by Inline::Lua */
@@ -235,30 +275,23 @@ push_val (lua_State *L, SV *val) {
 	return;
     }
 
-    switch (SvTYPE(val)) {
-	case SVt_IV:
-            if(SvROK(val)) {
-                push_ref(L, val);
-            } else {
+	if (SvNOK(val)) {
+		lua_pushnumber(L, (lua_Number)SvNV(val));
+	} else if (SvROK(val)) {
+		push_ref(L, val);
+	} else if (SvIOK(val)) {
 #if LUA_VERSION_NUM < 503
-                lua_pushnumber(L, (lua_Number)SvIV(val));
+		lua_pushnumber(L, (lua_Number)SvIV(val));
 #else
-                lua_pushinteger(L, (lua_Integer)SvIV(val));
+		lua_pushinteger(L, (lua_Integer)SvIV(val));
 #endif
-            }
-	    return;
-	case SVt_NV:
-	    lua_pushnumber(L, (lua_Number)SvNV(val));
-	    return;
-	case SVt_PV: case SVt_PVIV:
-	case SVt_PVNV: case SVt_PVMG:
-	    {
+	} else if (SvPOK(val)) {
 		STRLEN n_a;
 		char *cval = SvPV(val, n_a);
 		lua_pushlstring(L, cval, n_a);
-		return;
-	    }
-    }
+	} else {
+		croak("Unable to push value of type %s", svtype_name(SvTYPE(val)));
+	}
 }
 
 /* Turns a Lua type into a Perl type and returns it.
