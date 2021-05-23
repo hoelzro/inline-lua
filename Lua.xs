@@ -231,10 +231,14 @@ svtype_name(svtype type) {
 			return "PVNV";
 		case SVt_PVMG:
 			return "PVMG";
+#ifdef SVt_INVLIST
 		case SVt_INVLIST:
 			return "INVLIST";
+#endif
+#ifdef SVt_REGEXP
 		case SVt_REGEXP:
 			return "REGEXP";
+#endif
 		case SVt_PVGV:
 			return "PVGV";
 		case SVt_PVLV:
