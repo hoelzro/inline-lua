@@ -275,10 +275,10 @@ push_val (lua_State *L, SV *val) {
 	return;
     }
 
-	if (SvNOK(val)) {
-		lua_pushnumber(L, (lua_Number)SvNV(val));
-	} else if (SvROK(val)) {
+	if (SvROK(val)) {
 		push_ref(L, val);
+	} else if (SvNOK(val)) {
+		lua_pushnumber(L, (lua_Number)SvNV(val));
 	} else if (SvIOK(val)) {
 #if LUA_VERSION_NUM < 503
 		lua_pushnumber(L, (lua_Number)SvIV(val));
